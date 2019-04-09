@@ -45,7 +45,7 @@ impl Vec2D {
     }
 
     pub fn cross(&self, other: &Vec2D) -> f64 {
-        self.y * other.x - self.x * other.y
+        self.x * other.y - self.y * other.x
     }
 
     pub fn orthogonal(&self) -> Vec2D {
@@ -58,6 +58,12 @@ impl Vec2D {
 
     pub fn distance(&self, other: &Vec2D) -> f64 {
         self.distance_sqr(other).sqrt()
+    }
+
+    pub fn angle_between(&self, other: &Vec2D) -> Angle {
+        let cross = self.cross(other);
+        let dot = self.dot(other);
+        return Angle::from_atan2(cross, dot);
     }
 }
 
@@ -111,5 +117,26 @@ impl Rotatable<&Angle> for Vec2D {
         let x = self.x * cos - self.y * sin;
         let y = self.x * sin + self.y * cos;
         Vec2D::new(x, y)
+    }
+}
+
+
+#[cfg(test)]
+mod test {
+    use rand::Rng;
+    use super::*;
+    #[test]
+    fn create_and_tup() {
+        let mut rng = rand::thread_rng();
+        for _ in 0..100 {
+            let x = rng.gen::<f64>();
+            let y = rng.gen::<f64>();
+            let v1 = Vec2D::new(x, y);
+            let v2 = Vec2D::from_topule((x, y));
+            assert_eq!(v1.x, x);
+            assert_eq!(v1.y, y);
+            assert_eq!(v1, v2);
+            assert_eq!(v1.as_tuple(), (x, y));
+        }
     }
 }

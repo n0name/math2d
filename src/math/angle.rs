@@ -14,6 +14,10 @@ impl Angle {
         Angle {val: angle}
     }
 
+    pub fn from_atan2(y: f64, x: f64) -> Angle {
+        Angle {val: y.atan2(x)}
+    }
+
     pub fn deg(&self) -> f64 {
         self.val.to_degrees()
     }
@@ -65,6 +69,11 @@ mod test {
             let from_rad = Angle::from_rad((a as f64).to_radians());
             assert!(from_deg.is_eq(&from_rad, EPS));
         }
+
+        assert!(Angle::from_atan2(0.0, 1.0).normalized().is_eq(&Angle::from_deg(0.0), EPS));
+        assert!(Angle::from_atan2(1.0, 0.0).normalized().is_eq(&Angle::from_deg(90.0), EPS));
+        assert!(Angle::from_atan2(0.0, -1.0).normalized().is_eq(&Angle::from_deg(180.0), EPS));
+        assert!(Angle::from_atan2(-1.0, 0.0).normalized().is_eq(&Angle::from_deg(270.0), EPS));
     }
 
     #[test]
