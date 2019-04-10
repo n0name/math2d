@@ -175,6 +175,13 @@ impl Rotatable<&Angle> for Vec2D {
     }
 }
 
+impl AlmostEq for Vec2D {
+    fn is_eq(&self, rhs: &Vec2D, eps: f64) -> bool
+    {
+        self.x.is_eq(&rhs.x, eps) && self.y.is_eq(&rhs.y, eps)
+    }
+}
+
 Op!(Add, add, +);
 Op!(Sub, sub, -);
 Op!(Mul, mul, *);
@@ -257,6 +264,25 @@ mod test {
         for (v, a) in tests {
             let angle = Angle::from_deg(a).normalized();
             assert!(v.angle().is_eq(&angle, EPS));
+        }
+    }
+
+    #[test]
+    fn rotations() {
+        let v = Vec2D::new(1.0, 0.0);
+        let tests = vec!{
+            (Vec2D::new(1.0, 0.0), 0.0),
+            (Vec2D::new(0.0, 1.0), 90.0),
+            (Vec2D::new(-1.0, 0.0), 180.0),
+            (Vec2D::new(0.0, -1.0), 270.0)
+        };
+
+        for (tv, a) in tests {
+            let rv = v.rotated(&Angle::from_deg(a));
+            let mut temp = Vec2D::new(1.0, 0.0);
+            temp.rotate(&Angle::from_deg(a));
+            assert!(rv.is_eq(&tv, EPS));
+            assert!(temp.is_eq(&tv, EPS));
         }
     }
 }
