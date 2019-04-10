@@ -285,4 +285,39 @@ mod test {
             assert!(temp.is_eq(&tv, EPS));
         }
     }
+
+    #[test]
+    fn ops() {
+        let coords1 = gen_xys(100);
+        let coords2 = gen_xys(100);
+        let mut rng = rand::thread_rng();
+        for (c1, c2) in coords1.iter().zip(coords2) {
+            let (x1, y1) = c1;
+            let (x2, y2) = c2;
+            let v1 = Vec2D::new(*x1, *y1);
+            let v2 = Vec2D::new(x2, y2);
+            let rand = rng.gen::<f64>();
+
+            let sum = v1 + v2;
+            assert_eq!(sum.as_tuple(), (x1 + x2, y1 + y2));
+
+            let dif = v1 - v2;
+            assert_eq!(dif.as_tuple(), (x1 - x2, y1 - y2));
+
+            let mul = v1 * v2;
+            assert_eq!(mul.as_tuple(), (x1 * x2, y1 * y2));
+
+            let sum_num = v1 + rand;
+            assert_eq!(sum_num.as_tuple(), (x1 + rand, y1 + rand));
+
+            let diff_num = v1 - rand;
+            assert_eq!(diff_num.as_tuple(), (x1 - rand, y1 - rand));
+
+            let mul_num = v1 * rand;
+            assert_eq!(mul_num.as_tuple(), (x1 * rand, y1 * rand));
+
+            let div_num = v1 / rand;
+            assert_eq!(div_num.as_tuple(), (x1 / rand, y1 / rand));
+        }
+    }
 }
