@@ -1,4 +1,26 @@
 use super::common::*;
+use std::ops::*;
+
+macro_rules! Op {
+    ($op_trait: ident, $op_func: ident, $op: tt) => {
+        impl $op_trait for Angle {
+            type Output = Angle;
+            fn $op_func(self, rhs: Angle) -> Angle {
+                Angle{val: self.val $op rhs.val}
+            }
+        }
+    };
+}
+
+macro_rules! OpAsn {
+    ($op_trait: ident, $op_func: ident, $op: tt) => {
+        impl $op_trait for Angle {
+            fn $op_func(&mut self, rhs: Angle){
+                self.val $op rhs.val;
+            }
+        }
+    };
+}
 
 #[derive(Debug, PartialEq, Clone, Copy, PartialOrd)]
 pub struct Angle {
@@ -59,9 +81,20 @@ impl Normalizable for Angle {
     }
 }
 
+Op!(Add, add, +);
+Op!(Sub, sub, -);
+Op!(Mul, mul, *);
+Op!(Div, div, /);
+
+OpAsn!(AddAssign, add_assign, +=);
+OpAsn!(SubAssign, sub_assign, -=);
+OpAsn!(MulAssign, mul_assign, *=);
+OpAsn!(DivAssign, div_assign, /=);
+
 #[cfg(test)]
 mod test {
     use super::*;
+    use rand::Rng;
     #[test]
     fn create() {
         for a in (0..360).step_by(2) {
@@ -91,6 +124,21 @@ mod test {
             let angle = Angle::from_deg(a as f64);
             assert!(angle.rad().is_eq(&(a as f64).to_radians(), EPS));
             assert!(angle.deg().is_eq(&(a as f64), EPS));
+        }
+    }
+
+    #[test]
+    fn ops() {
+        let mut rng = rand::thread_rng();
+        for _ in 0..100 {
+            let a = rng.gen::<f64>();
+            let ang = Angle::from_rad(a);
+            let b = rng.gen::<f64>();
+            let ang2 = Angle::from_rad(b);
+            assert!((ang + ang2).val.is_eq(&(a + b), EPS));
+            assert!((ang - ang2).val.is_eq(&(a - b), EPS));
+            assert!((ang * ang2).val.is_eq(&(a * b), EPS));
+            assert!((ang / ang2).val.is_eq(&(a / b), EPS));
         }
     }
 
